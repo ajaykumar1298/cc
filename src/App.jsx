@@ -1,54 +1,88 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import './App.css';
 
 function App() {
-  let [amount,setAmount]=useState(0)
-  let [fromCurr,setFromCurr]=useState("usd")
-  let [toCurr,setToCurr]=useState("inr")
-  let [calAmount,setCalAmount]=useState(null)
-  let swapCurr =()=>{
-    setToCurr(fromCurr)
-  setFromCurr(toCurr)
-  }
+  let [amount, setAmount] = useState(null);
+  let [fromCurr, setFromCurr] = useState('usd');
+  let [toCurr, setToCurr] = useState('inr');
+  let [calAmount, setCalAmount] = useState(null);
+  let [currency, setCurrency] = useState({});
+  let [showResult,setShowResult]=useState(false)
+
+  useEffect(() => {
+    fetch(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${fromCurr}.min.json`)
+      .then((res) => res.json())
+      .then((data) => {
+        setCurrency(data[fromCurr])}
+      );
+  }, [fromCurr, toCurr]);
 
   return (
-  <>
-  <div className="container">
-    <div className="heading-section">
-      <h1>currency convertor</h1>
-    </div>
-    <div className="amount-section">
-      <label htmlFor="curr-input">amount</label>
-      <input type="number"  value={amount} min={0} onChange={(e)=>setAmount(e.target.value)} />
-    </div>
-    <div className="currency-section">
-      <div className="form-currency">
-        <label htmlFor="from">from</label>
-        <select value={fromCurr} onChange={(e)=>setFromCurr(e.target.value)}>
-          <option value="usd">usd</option>
-          <option value="EUR">EUR</option>
-          <option value="inr">inr</option>
-        </select>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center mb-4">Currency Converter</h1>
+        <div className="mb-4">
+          <label className="block text-gray-700 mb-2">Amount</label>
+          <input
+            type="number"
+            className="w-full p-2 border border-gray-300 rounded"
+            value={amount}
+            min={0}
+            onChange={(e) => {
+              setShowResult(false) 
+              setAmount(e.target.value)
+            }}
+          />
+        </div>
+        <div className="flex gap-4 mb-4">
+          <div className="w-1/2">
+            <label className="block text-gray-700 mb-2">From</label>
+            <select
+              className="w-full p-2 border border-gray-300 rounded"
+              value={fromCurr}
+              onChange={(e) => {
+                setShowResult(false) 
+                setFromCurr(e.target.value)
+              }}
+            >
+              {Object.keys(currency).map((cur) => (
+                <option key={cur} value={cur}>{cur.toUpperCase()}</option>
+              ))}
+            </select>
+          </div>
+          <div className="w-1/2">
+            <label className="block text-gray-700 mb-2">To</label>
+            <select
+              className="w-full p-2 border border-gray-300 rounded"
+              value={toCurr}
+              onChange={(e) => {
+                // setShowResult(false) 
+                setToCurr(e.target.value)
+              }}
+            >
+              {Object.keys(currency).map((cur) => (
+                <option key={cur} value={cur}>{cur.toUpperCase()}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <button
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          onClick={() => {
+            setCalAmount(currency[toCurr] * amount)
+            setShowResult(true)
+          }}
+        >
+          Convert Currency
+        </button>
+        {calAmount>0 && showResult  && (
+          <p className="mt-4 text-center text-lg font-semibold">
+            {amount} {fromCurr.toUpperCase()} = {calAmount} {toCurr.toUpperCase()}
+          </p>
+        )}
       </div>
-      <button type='button' onClick={swapCurr}> swap currency</button>
-      <div className="to-currency">
-        <label htmlFor="to">to</label>
-        <select value={toCurr} onChange={(e)=>setToCurr(e.target.value)}>
-          <option value="inr">inr</option>
-          <option value="EUR">EUR</option>
-          <option value="usd">usd</option>
-        </select>
-      </div>
     </div>
-    <div className="footer-section">
-      <button type='button'>Currency Convertor</button>
-      {calAmount &&  <p> 1 usd is equal to 83 inr</p>} 
-    </div>
-  </div>
-  </>
-  )
+  );
 }
 
-export default App
+export default App;
