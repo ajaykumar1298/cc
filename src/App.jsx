@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
-  let [amount, setAmount] = useState(null);
+  let [amount, setAmount] = useState("");
   let [fromCurr, setFromCurr] = useState('usd');
   let [toCurr, setToCurr] = useState('inr');
-  let [calAmount, setCalAmount] = useState(null);
+  let [calAmount, setCalAmount] = useState("");
   let [currency, setCurrency] = useState({});
   let [showResult,setShowResult]=useState(false)
 
@@ -29,6 +29,7 @@ function App() {
             value={amount}
             min={0}
             onChange={(e) => {
+              // setAmount("")
               setShowResult(false) 
               setAmount(e.target.value)
             }}
@@ -56,6 +57,7 @@ function App() {
               className="w-full p-2 border border-gray-300 rounded"
               value={toCurr}
               onChange={(e) => {
+              
                 // setShowResult(false) 
                 setToCurr(e.target.value)
               }}
@@ -71,13 +73,14 @@ function App() {
           onClick={() => {
             setCalAmount(currency[toCurr] * amount)
             setShowResult(true)
+            // setAmount("")
           }}
         >
           Convert Currency
         </button>
         {calAmount>0 && showResult  && (
           <p className="mt-4 text-center text-lg font-semibold">
-            {amount} {fromCurr.toUpperCase()} = {calAmount} {toCurr.toUpperCase()}
+            {amount} {fromCurr.toUpperCase()} = {Number(calAmount).toFixed(2)} {toCurr.toUpperCase()}
           </p>
         )}
       </div>
